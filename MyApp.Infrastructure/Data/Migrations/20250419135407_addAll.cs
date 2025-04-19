@@ -5,7 +5,7 @@
 namespace MyApp1.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class createSchema : Migration
+    public partial class addAll : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

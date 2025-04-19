@@ -12,8 +12,8 @@ using MyApp1.Infrastructure.Data;
 namespace MyApp1.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250419133749_b")]
-    partial class b
+    [Migration("20250419135407_addAll")]
+    partial class addAll
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -789,13 +789,13 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Blocked")
                         .WithMany()
                         .HasForeignKey("BlockedId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Blocker")
                         .WithMany()
                         .HasForeignKey("BlockerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Blocked");
