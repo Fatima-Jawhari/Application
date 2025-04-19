@@ -34,17 +34,18 @@ namespace MyApp1.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Post Configuration
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.HasKey(p => p.PostID);
                 entity.Property(p => p.Content).IsRequired();
                 entity.Property(p => p.CreatedAt);
+
                 entity.HasOne(p => p.User)
                     .WithMany()
                     .HasForeignKey(p => p.UserID)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Cascade); // ✅ keep cascade here (only one path)
             });
+
 
             // Comment Configuration
             modelBuilder.Entity<Comment>(entity =>
@@ -227,15 +228,19 @@ namespace MyApp1.Infrastructure.Data
             {
                 entity.HasKey(sp => sp.Id);
                 entity.Property(sp => sp.SavedAt).HasDefaultValueSql("GETDATE()");
+
                 entity.HasOne(sp => sp.User)
                     .WithMany()
                     .HasForeignKey(sp => sp.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction); // 
+
                 entity.HasOne(sp => sp.Post)
                     .WithMany()
                     .HasForeignKey(sp => sp.PostId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction); //
             });
+
+
 
             // Setting Configuration
             modelBuilder.Entity<Setting>(entity =>
