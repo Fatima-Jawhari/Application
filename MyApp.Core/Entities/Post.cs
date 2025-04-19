@@ -18,5 +18,7 @@ namespace MyApp1.Core.Entities
         public required ApplicationUser User { get; set; }
         public required  ICollection<Comment> Comments { get; set; }
         public required ICollection<Like> Likes { get; set; }
+
+        public required  ICollection<Hashtag> Hashtags { get; set; }
     }
 }

@@ -242,7 +242,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("BlockedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("BlockedId")
                         .IsRequired()
@@ -271,7 +273,8 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -301,7 +304,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -309,7 +314,8 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -328,7 +334,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -363,7 +371,8 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -384,7 +393,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RegisteredAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -409,7 +420,8 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -428,10 +440,14 @@ namespace MyApp1.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -556,10 +572,14 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(max)");
@@ -601,9 +621,6 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("HashtagId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
@@ -613,53 +630,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
                     b.HasKey("PostID");
 
-                    b.HasIndex("HashtagId");
-
                     b.HasIndex("UserID");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("MyApp1.Core.Entities.Report", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdditionalDetails")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ReportedPostId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ReportedPostPostID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReportedUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ReporterId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportedPostPostID");
-
-                    b.HasIndex("ReportedUserId");
-
-                    b.HasIndex("ReporterId");
-
-                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("MyApp1.Core.Entities.SavedPost", b =>
@@ -674,7 +647,9 @@ namespace MyApp1.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SavedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -698,19 +673,27 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsPrivateProfile")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("ReceiveEmailNotifications")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("ReceivePushNotifications")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("ThemePreference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -721,6 +704,92 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Settings");
+                });
+
+            modelBuilder.Entity("MyApp1.Core.Entities.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ConnectedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("FolloweeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FollowerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FolloweeId");
+
+                    b.HasIndex("FollowerId");
+
+                    b.ToTable("UserConnections");
+                });
+
+            modelBuilder.Entity("PostHashtag", b =>
+                {
+                    b.Property<int>("HashtagId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HashtagId", "PostId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostHashtags", (string)null);
+                });
+
+            modelBuilder.Entity("Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ReportedPostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReportedUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ReporterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedPostId");
+
+                    b.HasIndex("ReportedUserId");
+
+                    b.HasIndex("ReporterId");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("MyApp1.Core.Entities.ApplicationUser", b =>
@@ -811,7 +880,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Post");
@@ -830,7 +899,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Community");
@@ -860,7 +929,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Event");
@@ -879,7 +948,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -898,7 +967,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Post");
@@ -928,7 +997,7 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -949,10 +1018,6 @@ namespace MyApp1.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("MyApp1.Core.Entities.Post", b =>
                 {
-                    b.HasOne("MyApp1.Core.Entities.Hashtag", null)
-                        .WithMany("Posts")
-                        .HasForeignKey("HashtagId");
-
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
@@ -960,29 +1025,6 @@ namespace MyApp1.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MyApp1.Core.Entities.Report", b =>
-                {
-                    b.HasOne("MyApp1.Core.Entities.Post", "ReportedPost")
-                        .WithMany()
-                        .HasForeignKey("ReportedPostPostID");
-
-                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "ReportedUser")
-                        .WithMany()
-                        .HasForeignKey("ReportedUserId");
-
-                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Reporter")
-                        .WithMany()
-                        .HasForeignKey("ReporterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportedPost");
-
-                    b.Navigation("ReportedUser");
-
-                    b.Navigation("Reporter");
                 });
 
             modelBuilder.Entity("MyApp1.Core.Entities.SavedPost", b =>
@@ -1015,6 +1057,65 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MyApp1.Core.Entities.UserConnection", b =>
+                {
+                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Followee")
+                        .WithMany()
+                        .HasForeignKey("FolloweeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Follower")
+                        .WithMany()
+                        .HasForeignKey("FollowerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Followee");
+
+                    b.Navigation("Follower");
+                });
+
+            modelBuilder.Entity("PostHashtag", b =>
+                {
+                    b.HasOne("MyApp1.Core.Entities.Hashtag", null)
+                        .WithMany()
+                        .HasForeignKey("HashtagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyApp1.Core.Entities.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Report", b =>
+                {
+                    b.HasOne("MyApp1.Core.Entities.Post", "ReportedPost")
+                        .WithMany()
+                        .HasForeignKey("ReportedPostId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "ReportedUser")
+                        .WithMany()
+                        .HasForeignKey("ReportedUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ReportedPost");
+
+                    b.Navigation("ReportedUser");
+
+                    b.Navigation("Reporter");
+                });
+
             modelBuilder.Entity("MyApp1.Core.Entities.Community", b =>
                 {
                     b.Navigation("Members");
@@ -1025,11 +1126,6 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("MyApp1.Core.Entities.Hashtag", b =>
-                {
-                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("MyApp1.Core.Entities.Post", b =>
