@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp1.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MyApp1.Infrastructure.Data;
 namespace MyApp1.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250419133749_b")]
+    partial class b
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -786,13 +789,13 @@ namespace MyApp1.Infrastructure.Data.Migrations
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Blocked")
                         .WithMany()
                         .HasForeignKey("BlockedId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("MyApp1.Core.Entities.ApplicationUser", "Blocker")
                         .WithMany()
                         .HasForeignKey("BlockerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Blocked");

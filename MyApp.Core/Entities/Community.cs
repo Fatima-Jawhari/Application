@@ -13,6 +13,6 @@ namespace MyApp1.Core.Entities
         public required string Description { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        public required  ICollection<CommunityMemberships> Members { get; set; }
+        public required  ICollection<CommunityMembership> Members { get; set; }
     }
 }

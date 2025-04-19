@@ -9,8 +9,8 @@ namespace MyApp1.Core.Entities
     public class Post
     {
         public int PostID { get; set; }
-        public string UserID { get; set; } // FK to ApplicationUser
-        public string Content { get; set; }
+        public  required string UserID { get; set; } // FK to ApplicationUser
+        public required  string Content { get; set; }
         public string? ImageURL { get; set; }
         public DateTime CreatedAt { get; set; }
 

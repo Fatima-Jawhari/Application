@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Core.Entities
 {
-    public class CommunityMemberships
+    public class CommunityMembership
     {
         public int Id { get; set; }
 

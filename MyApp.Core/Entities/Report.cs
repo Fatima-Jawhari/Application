@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Core.Entities
 {
-    public class Reports
+    public class Report
     {
         public int Id { get; set; }
 
-        public required  string ReporterId { get; set; }
+        public required string ReporterId { get; set; }
         public required ApplicationUser Reporter { get; set; }
 
         public string? ReportedUserId { get; set; }
@@ -22,8 +22,7 @@ namespace MyApp1.Core.Entities
         public required string Reason { get; set; }
         public string? AdditionalDetails { get; set; }
 
-        public DateTime
-
-    } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }
 
