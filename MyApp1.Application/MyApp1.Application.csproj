@@ -26,4 +26,8 @@
     <ProjectReference Include="..\MyApp.Core\MyApp1.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+  </ItemGroup>
+
 </Project>
