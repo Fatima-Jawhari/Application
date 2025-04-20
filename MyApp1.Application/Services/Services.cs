@@ -18,54 +18,66 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task CreateAsync(EventDto dto)
+        public async Task<IEnumerable<EventDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var events = await _repository.GetAllAsync();
+            return _mapper.Map<IEnumerable<EventDto>>(events);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<EventDto> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var eventEntity = await _repository.GetByIdAsync(id);
+            if (eventEntity == null)
+                throw new KeyNotFoundException($"Event with ID {id} was not found.");
+            return _mapper.Map<EventDto>(eventEntity);
         }
 
-        public Task<IEnumerable<EventDto>> GetAllAsync()
+        public async Task CreateAsync(EventDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Event data cannot be null.");
+
+            var eventEntity = _mapper.Map<Event>(dto);
+
+            // Business logic example: prevent creating past events
+            if (eventEntity.EventDate < DateTime.UtcNow)
+                throw new InvalidOperationException("Event date must be set in the future.");
+
+            await _repository.AddAsync(eventEntity);
         }
 
-        public Task<EventDto> GetByIdAsync(Guid id)
+        public async Task UpdateAsync(EventDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Event data cannot be null.");
+
+            var existingEvent = await _repository.GetByIdAsync(dto.Id);
+            if (existingEvent == null)
+                throw new KeyNotFoundException($"Event with ID {dto.Id} does not exist.");
+
+            var updatedEvent = _mapper.Map<Event>(dto);
+            await _repository.UpdateAsync(updatedEvent);
         }
 
-        public Task UpdateAsync(EventDto dto)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var eventEntity = await _repository.GetByIdAsync(id);
+            if (eventEntity == null)
+                throw new KeyNotFoundException($"Event with ID {id} does not exist.");
+
+            await _repository.DeleteAsync(id);  // pass the id, not the entity
         }
-
-        //public async Task<IEnumerable<EventDto>> GetAllAsync() =>
-        //    _mapper.Map<IEnumerable<EventDto>>(await _repository.GetAllAsync());
-
-        //public async Task<EventDto> GetByIdAsync(Guid id) =>
-        //    _mapper.Map<EventDto>(await _repository.GetByIdAsync(id));
-
-        //public async Task CreateAsync(EventDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Event>(dto));
-
-        //public async Task UpdateAsync(EventDto dto) =>
-        //    await _repository.UpdateAsync(_mapper.Map<Event>(dto));
-
-        //public async Task DeleteAsync(Guid id) =>
-        //    await _repository.DeleteAsync(_mapper.Map<Event>(id));
     }
 
     public class EventParticipantService : IEventParticipantService
     {
         private readonly IEventParticipantRepository _repository;
+        private readonly IMapper _mapper;
 
-        public EventParticipantService(IEventParticipantRepository repository)
+        public EventParticipantService(IEventParticipantRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<EventParticipant>> GetAsync(Guid id)
@@ -103,21 +115,30 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task CreateAsync(GroupDto dto)
+        public async Task<IEnumerable<GroupDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var groups = await _repository.GetAllAsync();
+            return groups.Select(g => new GroupDto
+            {
+                Id = Guid.NewGuid(),
+                Name = g.Name
+            });
         }
 
-        public Task<IEnumerable<GroupDto>> GetAllAsync()
+        public async Task CreateAsync(GroupDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Group data cannot be null.");
+
+            var group = new Group
+            {
+                Name = dto.Name,
+                Members = new List<GroupMember>(),
+                Messages = new List<Message>()
+            };
+
+            await _repository.AddAsync(group);
         }
-
-        //public async Task<IEnumerable<GroupDto>> GetAllAsync() =>
-        //    _mapper.Map<IEnumerable<GroupDto>>(await _repository.GetAllAsync());
-
-        //public async Task CreateAsync(GroupDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Group>(dto));
     }
 
     public class GroupMemberService : IGroupMemberService
@@ -129,39 +150,73 @@ namespace MyApp1.Application.Services
             _repository = repository;
         }
 
-        public Task AddMemberAsync(Guid groupId, Guid userId)
+        public async Task AddMemberAsync(Guid groupId, Guid userId)
         {
-            throw new NotImplementedException();
+            if (groupId == Guid.Empty || userId == Guid.Empty)
+                throw new ArgumentException("Group ID and User ID must be valid GUIDs.");
+
+            var groupMember = new GroupMember
+            {
+                GroupId = ConvertGuidToInt(groupId),
+                UserId = ConvertGuidToInt(userId),
+                JoinedAt = DateTime.UtcNow,
+                IsAdmin = false
+            };
+
+            await _repository.AddMemberAsync(groupMember);
         }
 
-        public Task RemoveMemberAsync(Guid groupId, Guid userId)
+        public async Task RemoveMemberAsync(Guid groupId, Guid userId)
         {
-            throw new NotImplementedException();
+            if (groupId == Guid.Empty || userId == Guid.Empty)
+                throw new ArgumentException("Group ID and User ID must be valid GUIDs.");
+
+            await _repository.RemoveMemberAsync(groupId, userId);
         }
 
-        //public async Task AddMemberAsync(Guid groupId, Guid userId) =>
-        //    await _repository.AddMemberAsync(groupId, userId);
+        public async Task<IEnumerable<GroupMemberDto>> GetAllAsync()
+        {
+            var members = await _repository.GetAllAsync();
+            return members.Select(m => new GroupMemberDto
+            {
+                Id = Guid.NewGuid(),
+                GroupId = ConvertIntToGuid(m.GroupId), 
+                UserId = ConvertIntToGuid(m.UserId) 
+            });
+        }
 
-        //public async Task RemoveMemberAsync(Guid groupId, Guid userId) =>
-        //    await _repository.RemoveMemberAsync(groupId, userId);
+        private int ConvertGuidToInt(Guid guid)
+        {
+            return BitConverter.ToInt32(guid.ToByteArray(), 0);
+        }
+        public Guid ConvertIntToGuid(int value)
+        {
+            byte[] bytes = new byte[16];
+            BitConverter.GetBytes(value).CopyTo(bytes, 0);
+            return new Guid(bytes);
+        }
     }
+
+
 
     public class HashtagService : IHashtagService
     {
         private readonly IHashtagRepository _repository;
+        private readonly IMapper _mapper;
 
-        public HashtagService(IHashtagRepository repository)
+        public HashtagService(IHashtagRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public Task<IEnumerable<HashtagDto>> GetTrendingAsync()
+        public async Task<IEnumerable<HashtagDto>> GetTrendingAsync()
         {
-            throw new NotImplementedException();
+            var trendingHashtags = await _repository.GetTrendingAsync();
+            return _mapper.Map<IEnumerable<HashtagDto>>(trendingHashtags);
+
         }
 
-        //public async Task<IEnumerable<HashtagDto>> GetTrendingAsync() =>
-        //    (IEnumerable<HashtagDto>)await _repository.GetTrendingAsync();
     }
 
     public class LikeService : ILikeService
@@ -173,29 +228,27 @@ namespace MyApp1.Application.Services
             _repository = repository;
         }
 
-        public Task<int> GetLikeCountAsync(Guid postId)
+        public async Task<int> GetLikeCountAsync(Guid postId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetCountAsync(postId);
         }
 
-        public Task LikePostAsync(Guid userId, Guid postId)
+        public async Task LikePostAsync(Guid userId, Guid postId)
         {
-            throw new NotImplementedException();
+            var like = new Like
+            {
+                UserId = userId,
+                PostId = postId,
+                LikedAt = DateTime.UtcNow
+            };
+
+            await _repository.LikeAsync(like);
         }
 
-        public Task UnlikePostAsync(Guid userId, Guid postId)
+        public async Task UnlikePostAsync(Guid userId, Guid postId)
         {
-            throw new NotImplementedException();
+            await _repository.UnlikeAsync(userId, postId);
         }
-
-        //public async Task LikePostAsync(Guid userId, Guid postId) =>
-        //    await _repository.LikeAsync(userId, postId);
-
-        //public async Task UnlikePostAsync(Guid userId, Guid postId) =>
-        //    await _repository.UnlikeAsync(userId, postId);
-
-        //public async Task<int> GetLikeCountAsync(Guid postId) =>
-        //    await _repository.GetCountAsync(postId);
     }
 
     public class MediaService : IMediaService
@@ -209,29 +262,26 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
 
-        public Task<IEnumerable<MediaDto>> GetUserMediaAsync(Guid userId)
+        public async Task<IEnumerable<MediaDto>> GetUserMediaAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            var media = await _repository.GetByUserIdAsync(userId);
+            return _mapper.Map<IEnumerable<MediaDto>>(media);
         }
 
-        public Task UploadAsync(MediaDto dto)
+        public async Task UploadAsync(MediaDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var media = _mapper.Map<Media>(dto);
+            await _repository.AddAsync(media);
         }
 
-        //public async Task<IEnumerable<MediaDto>> GetUserMediaAsync(Guid userId) =>
-        //    _mapper.Map<IEnumerable<MediaDto>>(await _repository.GetByUserIdAsync(userId));
-
-        //public async Task UploadAsync(MediaDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Media>(dto));
-
-        //public async Task DeleteAsync(Guid id) =>
-        //    await _repository.DeleteAsync(id);
     }
 
     public class MessageService : IMessageService
@@ -245,29 +295,25 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<IEnumerable<MessageDto>> GetByUserAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            var messages = await _repository.GetByUserIdAsync(userId);
+            return _mapper.Map<IEnumerable<MessageDto>>(messages);
         }
 
-        public Task<IEnumerable<MessageDto>> GetByUserAsync(Guid userId)
+        public async Task SendMessageAsync(MessageDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var message = _mapper.Map<Message>(dto);
+            await _repository.AddAsync(message);
         }
 
-        public Task SendMessageAsync(MessageDto dto)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
-
-        //public async Task<IEnumerable<MessageDto>> GetByUserAsync(Guid userId) =>
-        //    _mapper.Map<IEnumerable<MessageDto>>(await _repository.GetByUserIdAsync(userId));
-
-        //public async Task SendMessageAsync(MessageDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Message>(dto));
-
-        //public async Task DeleteAsync(Guid id) =>
-        //    await _repository.DeleteAsync(id);
     }
 
     public class NotificationService : INotificationService
@@ -281,29 +327,25 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
 
-        public Task<IEnumerable<NotificationDto>> GetByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<NotificationDto>> GetByUserIdAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            var notifications = await _repository.GetByUserIdAsync(userId);
+            return _mapper.Map<IEnumerable<NotificationDto>>(notifications);
         }
 
-        public Task SendNotificationAsync(NotificationDto dto)
+        public async Task SendNotificationAsync(NotificationDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var notification = _mapper.Map<Notification>(dto);
+            await _repository.SendAsync(notification);
         }
-
-        //public async Task<IEnumerable<NotificationDto>> GetByUserIdAsync(Guid userId) =>
-        //    _mapper.Map<IEnumerable<NotificationDto>>(await _repository.GetByUserIdAsync(userId));
-
-        //public async Task SendNotificationAsync(NotificationDto dto) =>
-        //    await _repository.SendAsync(_mapper.Map<Notification>(dto));
-
-        //public async Task DeleteAsync(Guid id) =>
-        //    await _repository.DeleteAsync(id);
     }
 
     public class PostService : IPostService

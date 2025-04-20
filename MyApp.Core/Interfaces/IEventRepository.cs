@@ -13,6 +13,6 @@ namespace MyApp1.Core.Interfaces
         Task<IEnumerable<Event>> GetByIdAsync(Guid id);
         Task AddAsync(Event @event);
         Task UpdateAsync(Event @event);
-        Task DeleteAsync(Event @event);
+        Task DeleteAsync(Guid id);
     }
 }

@@ -59,6 +59,7 @@ namespace MyApp1.Application.ServicesInterfaces
 
     public interface IGroupMemberService
     {
+        Task<IEnumerable<GroupMemberDto>> GetAllAsync();
         Task AddMemberAsync(Guid groupId, Guid userId);
         Task RemoveMemberAsync(Guid groupId, Guid userId);
     }

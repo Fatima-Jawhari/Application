@@ -11,10 +11,10 @@ namespace MyApp1.Core.Entities
         public int Id { get; set; }
 
         public required  Guid UserId { get; set; }
-        public required  ApplicationUser User { get; set; }
+        public  ApplicationUser User { get; set; }
 
         public Guid PostId { get; set; }
-        public required   Post Post { get; set; }
+        public   Post Post { get; set; }
 
         public DateTime LikedAt { get; set; }
     }
