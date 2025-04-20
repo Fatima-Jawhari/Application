@@ -9,8 +9,8 @@ namespace MyApp1.Core.Interfaces
 {
     public interface IEventParticipantRepository
     {
-        Task <IEnumerable<EventParticipant>> GetAsync (string id);
-        Task AddAsync (EventParticipant eventParticipant);
-        Task DeleteAsync (string id);
+        Task <IEnumerable<EventParticipant>> GetAsync (Guid id);
+        Task JoinAsync (Guid user_id,Guid event_id);
+        Task LeaveAsync (Guid id ,Guid event_id);
     }
 }

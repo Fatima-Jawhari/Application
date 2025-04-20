@@ -11,7 +11,8 @@ namespace MyApp1.Core.Interfaces
     {
         Task <IEnumerable<Hashtag>> GetAllAsync();
         Task<IEnumerable<Hashtag>> GetByIdAsync(int id);
+        Task<IEnumerable<Hashtag>> GetTrendingAsync();
         Task AddAsync (Hashtag hashtag);
-        Task DeleteAsync(Hashtag hashtag);
+        Task DeleteAsync(int id);
     }
 }

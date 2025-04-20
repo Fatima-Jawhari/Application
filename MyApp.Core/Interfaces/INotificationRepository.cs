@@ -10,7 +10,9 @@ namespace MyApp1.Core.Interfaces
     public interface INotificationRepository
     {
         Task<IEnumerable<Notification>> GetAllAsync();
-        Task AddAsync(Notification notification);
+        Task<IEnumerable<Notification>> GetByUserIdAsync(Guid userId);
+        Task SendAsync(Notification notification);
         Task MarkReadAsync(Notification notification);
+        Task DeleteAsync(Guid id);
     }
 }

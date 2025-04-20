@@ -9,8 +9,8 @@ namespace MyApp1.Core.Interfaces
 {
     public interface ICommunityMembershipRepository
     {
-        Task <IEnumerable<ICommentRepository>> GetAsync (int id);
-        Task AddAsync(CommunityMembership communityMembership);
-        Task DeleteAsync (int id);
+        Task <IEnumerable<ICommentRepository>> GetAsync(Guid id);
+        Task JoinAsync(CommunityMembership communityMembership);
+        Task LeaveAsync(int id);
     }
 }

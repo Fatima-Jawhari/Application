@@ -10,9 +10,9 @@ namespace MyApp1.Core.Interfaces
     public interface IPostRepository
     {
         Task<IEnumerable<Post>> GetAllAsync();
-        Task<IEnumerable<Post>> GetByIdAsync(int id);
+        Task<IEnumerable<Post>> GetByIdAsync(Guid id);
         Task AddAsync(Post post);
         Task UpdateAsync(Post post);
-        Task DeleteAsync(Post post);
+        Task DeleteAsync(Guid id);
     }
 }

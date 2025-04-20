@@ -11,6 +11,6 @@ namespace MyApp1.Core.Entities
         public int Id { get; set; }
         public required string Tag { get; set; }
 
-        public required ICollection<Post> Posts { get; set; }
+        public ICollection<Post> Posts { get; set; }
     }
 }

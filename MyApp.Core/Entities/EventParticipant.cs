@@ -10,11 +10,11 @@ namespace MyApp1.Core.Entities
     {
         public int Id { get; set; }
 
-        public int EventId { get; set; }
-        public required Event Event { get; set; }
+        public required Guid EventId { get; set; }
+        public Event Event { get; set; } = null!;
 
-        public required string UserId { get; set; }
-        public required  ApplicationUser User { get; set; }
+        public required Guid UserId { get; set; }
+        public ApplicationUser User { get; set; } = null!;
 
         public DateTime RegisteredAt { get; set; }
     }

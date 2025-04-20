@@ -11,7 +11,8 @@ namespace MyApp1.Core.Interfaces
     {
         Task<IEnumerable<UserConnection>> GetAllAsync();
         Task<IEnumerable<UserConnection>> GetByIdAsync(int id);
-        Task AddAsync(UserConnection userConnection);
-        Task DeleteAsync(UserConnection userConnection);
+        Task<IEnumerable<Guid>> GetByUserIdAsync(Guid userId);
+        Task ConnectAsync(Guid userId, Guid otherUserId);
+        Task DisconnectAsync(Guid userId, Guid otherUserId);
     }
 }

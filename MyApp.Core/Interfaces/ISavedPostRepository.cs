@@ -11,7 +11,8 @@ namespace MyApp1.Core.Interfaces
     {
         Task<IEnumerable<SavedPost>> GetAllAsync();
         Task<IEnumerable<SavedPost>> GetByIdAsync(int id);
-        Task AddAsync(SavedPost savedPost);
-        Task DeleteAsync(SavedPost savedPost);
+        Task<IEnumerable<Guid>> GetByUserIdAsync(Guid userId);
+        Task SaveAsync(Guid userId, Guid postId);
+        Task UnsaveAsync(Guid userId, Guid postId);
     }
 }
