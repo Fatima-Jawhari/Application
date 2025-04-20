@@ -10,11 +10,11 @@ namespace MyApp1.Core.Entities
     {
         public int Id { get; set; }
 
-        public required string FollowerId { get; set; }
-        public required ApplicationUser Follower { get; set; }
+        public required Guid FollowerId { get; set; }
+        public ApplicationUser Follower { get; set; }
 
-        public required string FolloweeId { get; set; }
-        public required ApplicationUser Followee { get; set; }
+        public required Guid FollowedId { get; set; }
+        public ApplicationUser Followed { get; set; }
 
         public DateTime ConnectedAt { get; set; } = DateTime.UtcNow;
     }

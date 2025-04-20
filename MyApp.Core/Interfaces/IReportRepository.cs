@@ -10,6 +10,6 @@ namespace MyApp1.Core.Interfaces
     {
         Task<IEnumerable<Report>> GetAllAsync();
         Task AddAsync(Report report);
-        Task DeleteAsync(string id);
+        Task DeleteAsync(int id);
     }
 }

@@ -10,7 +10,8 @@ namespace MyApp1.Core.Interfaces
     public interface ILikeRepository
     {
         Task<IEnumerable<Like>> GetAlltAsync();
-        Task AddAsync(Like like);
-        Task Delete(Like like);
+        Task LikeAsync(Like like);
+        Task UnlikeAsync(Guid userId, Guid postId);
+        Task<int> GetCountAsync(Guid postId);
     }
 }

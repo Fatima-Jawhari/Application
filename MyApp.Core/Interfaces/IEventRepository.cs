@@ -10,7 +10,7 @@ namespace MyApp1.Core.Interfaces
     public interface IEventRepository
     {
         Task<IEnumerable<Event>> GetAllAsync();
-        Task<IEnumerable<Event>> GetByIdAsync(int id);
+        Task<IEnumerable<Event>> GetByIdAsync(Guid id);
         Task AddAsync(Event @event);
         Task UpdateAsync(Event @event);
         Task DeleteAsync(Event @event);

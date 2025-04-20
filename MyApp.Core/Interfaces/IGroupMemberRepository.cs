@@ -10,7 +10,7 @@ namespace MyApp1.Core.Interfaces
     public interface IGroupMemberRepository
     {
         Task<IEnumerable<GroupMember>> GetAllAsync();
-        Task AddAsync(GroupMember groupMember);
-        Task DeleteAsync(GroupMember groupMember);
+        Task AddMemberAsync(GroupMember groupMember);
+        Task RemoveMemberAsync(Guid groupId, Guid userId);
     }
 }

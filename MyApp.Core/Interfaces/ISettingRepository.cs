@@ -10,6 +10,8 @@ namespace MyApp1.Core.Interfaces
     public interface ISettingRepository
     {
         Task<IEnumerable<Setting>> GetAllAsync();
+
+        Task<IEnumerable<Setting>> GetByUserIdAsync(Guid userId);
         Task AddAsync(Setting setting);
         Task UpdateAsync(Setting setting);
     }

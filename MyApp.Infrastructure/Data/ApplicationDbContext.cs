@@ -280,9 +280,9 @@ namespace MyApp1.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(uc => uc.FollowerId)
                     .OnDelete(DeleteBehavior.NoAction);
-                entity.HasOne(uc => uc.Followee)
+                entity.HasOne(uc => uc.Followed)
                     .WithMany()
-                    .HasForeignKey(uc => uc.FolloweeId)
+                    .HasForeignKey(uc => uc.FollowedId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
