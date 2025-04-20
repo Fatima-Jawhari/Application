@@ -1,6 +1,6 @@
 ﻿using MyApp1.Application.DTOs;
 
-namespace AlumniConnect.Application.Interfaces
+namespace MyApp1.Application.ServicesInterfaces
 {
     public interface IAdminActionService
     {

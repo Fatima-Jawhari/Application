@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using MyApp1.Application.DTOs;
 using MyApp1.Core.Entities;
-using MyApp1.Application.
+using MyApp1.Application.ServicesInterfaces;
 
-
-namespace AlumniConnect.Application.Services
+namespace MyApp1.Application.Services
 {
     public class EventService : IEventService
     {
