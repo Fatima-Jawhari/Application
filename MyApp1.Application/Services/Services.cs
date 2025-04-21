@@ -95,7 +95,7 @@ namespace MyApp1.Application.Services
         public async Task JoinEventAsync(Guid userId, Guid eventId)
         {
             var participant = new EventParticipant { UserId = userId, EventId = eventId, RegisteredAt = DateTime.UtcNow };
-            await _repository.JoinAsync(userId,eventId);
+            await _repository.JoinAsync(userId, eventId);
         }
 
         public async Task LeaveEventAsync(Guid userId, Guid eventId)
@@ -180,8 +180,8 @@ namespace MyApp1.Application.Services
             return members.Select(m => new GroupMemberDto
             {
                 Id = Guid.NewGuid(),
-                GroupId = ConvertIntToGuid(m.GroupId), 
-                UserId = ConvertIntToGuid(m.UserId) 
+                GroupId = ConvertIntToGuid(m.GroupId),
+                UserId = ConvertIntToGuid(m.UserId)
             });
         }
 
@@ -359,46 +359,58 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task CreateAsync(PostDto dto)
+        public async Task<IEnumerable<PostDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var posts = await _repository.GetAllAsync();
+            return _mapper.Map<IEnumerable<PostDto>>(posts);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<PostDto> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var post = await _repository.GetByIdAsync(id);
+            return _mapper.Map<PostDto>(post);
         }
 
-        public Task<IEnumerable<PostDto>> GetAllAsync()
+        public async Task CreateAsync(PostDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Post cannot be null.");
+
+            var post = _mapper.Map<Post>(dto);
+            await _repository.AddAsync(post);
         }
 
-        public Task<PostDto> GetByIdAsync(Guid id)
+        public async Task UpdateAsync(PostDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Post cannot be null.");
+
+            var post = _mapper.Map<Post>(dto);
+            await _repository.UpdateAsync(post);
         }
 
-        public Task UpdateAsync(PostDto dto)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            await _repository.DeleteAsync(id);
         }
-
-        //public async Task<IEnumerable<PostDto>> GetAllAsync() =>
-        //    _mapper.Map<IEnumerable<PostDto>>(await _repository.GetAllAsync());
-
-        //public async Task<PostDto> GetByIdAsync(Guid id) =>
-        //    _mapper.Map<PostDto>(await _repository.GetByIdAsync(id));
-
-        //public async Task CreateAsync(PostDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Post>(dto));
-
-        //public async Task UpdateAsync(PostDto dto) =>
-        //    await _repository.UpdateAsync(_mapper.Map<Post>(dto));
-
-        //public async Task DeleteAsync(Guid id) =>
-        //    await _repository.DeleteAsync(id);
     }
+
+
+    //public async Task<IEnumerable<PostDto>> GetAllAsync() =>
+    //    _mapper.Map<IEnumerable<PostDto>>(await _repository.GetAllAsync());
+
+    //public async Task<PostDto> GetByIdAsync(Guid id) =>
+    //    _mapper.Map<PostDto>(await _repository.GetByIdAsync(id));
+
+    //public async Task CreateAsync(PostDto dto) =>
+    //    await _repository.AddAsync(_mapper.Map<Post>(dto));
+
+    //public async Task UpdateAsync(PostDto dto) =>
+    //    await _repository.UpdateAsync(_mapper.Map<Post>(dto));
+
+    //public async Task DeleteAsync(Guid id) =>
+    //    await _repository.DeleteAsync(id);
+
 
     public class ReportService : IReportService
     {
@@ -411,116 +423,175 @@ namespace MyApp1.Application.Services
             _mapper = mapper;
         }
 
-        public Task<IEnumerable<ReportDto>> GetAllAsync()
+        public async Task<IEnumerable<ReportDto>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var reports = await _repository.GetAllAsync();
+            return _mapper.Map<IEnumerable<ReportDto>>(reports);
         }
 
-        public Task SubmitReportAsync(ReportDto dto)
+        public async Task SubmitReportAsync(ReportDto dto)
         {
-            throw new NotImplementedException();
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Report cannot be null.");
+
+            var report = _mapper.Map<Report>(dto);
+            await _repository.AddAsync(report);
         }
-
-        //public async Task<IEnumerable<ReportDto>> GetAllAsync() =>
-        //    _mapper.Map<IEnumerable<ReportDto>>(await _repository.GetAllAsync());
-
-        //public async Task SubmitReportAsync(ReportDto dto) =>
-        //    await _repository.AddAsync(_mapper.Map<Report>(dto));
     }
 
-    public class SavedPostService : ISavedPostService
+
+
+    //public async Task<IEnumerable<ReportDto>> GetAllAsync() =>
+    //    _mapper.Map<IEnumerable<ReportDto>>(await _repository.GetAllAsync());
+
+    //public async Task SubmitReportAsync(ReportDto dto) =>
+    //    await _repository.AddAsync(_mapper.Map<Report>(dto));
+}
+
+public class SavedPostService : ISavedPostService
+{
+    private readonly ISavedPostRepository _repository;
+
+    public SavedPostService(ISavedPostRepository repository)
     {
-        private readonly ISavedPostRepository _repository;
-
-        public SavedPostService(ISavedPostRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public Task<IEnumerable<Guid>> GetSavedPostsAsync(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SavePostAsync(Guid userId, Guid postId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UnsavePostAsync(Guid userId, Guid postId)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public async Task SavePostAsync(Guid userId, Guid postId) =>
-        //    await _repository.SaveAsync(userId, postId);
-
-        //public async Task UnsavePostAsync(Guid userId, Guid postId) =>
-        //    await _repository.UnsaveAsync(userId, postId);
-
-        //public async Task<IEnumerable<Guid>> GetSavedPostsAsync(Guid userId) =>
-        //    await _repository.GetByUserIdAsync(userId);
+        _repository = repository;
     }
 
-    public class SettingService : ISettingService
+    public async Task<IEnumerable<Guid>> GetSavedPostsAsync(Guid userId)
     {
-        private readonly ISettingRepository _repository;
-        private readonly IMapper _mapper;
-
-        public SettingService(ISettingRepository repository, IMapper mapper)
-        {
-            _repository = repository;
-            _mapper = mapper;
-        }
-
-        public Task<SettingDto> GetUserSettingsAsync(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateSettingsAsync(SettingDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public async Task<SettingDto> GetUserSettingsAsync(Guid userId) =>
-        //    _mapper.Map<SettingDto>(await _repository.GetByUserIdAsync(userId));
-
-        //public async Task UpdateSettingsAsync(SettingDto dto) =>
-        //    await _repository.UpdateAsync(_mapper.Map<Setting>(dto));
+        return await _repository.GetByUserIdAsync(userId);
     }
 
-    public class UserConnectionService : IUserConnectionService
+    public async Task SavePostAsync(Guid userId, Guid postId)
     {
-        private readonly IUserConnectionRepository _repository;
+        await _repository.SaveAsync(userId, postId);
+    }
 
-        public UserConnectionService(IUserConnectionRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public Task ConnectAsync(Guid userId, Guid otherUserId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task DisconnectAsync(Guid userId, Guid otherUserId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Guid>> GetConnectionsAsync(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public async Task ConnectAsync(Guid userId, Guid otherUserId) =>
-        //    await _repository.ConnectAsync(userId, otherUserId);
-
-        //public async Task DisconnectAsync(Guid userId, Guid otherUserId) =>
-        //    await _repository.DisconnectAsync(userId, otherUserId);
-
-        //public async Task<IEnumerable<Guid>> GetConnectionsAsync(Guid userId) =>
-        //    await _repository.GetByUserIdAsync(userId);
+    public async Task UnsavePostAsync(Guid userId, Guid postId)
+    {
+        await _repository.UnsaveAsync(userId, postId);
     }
 }
+
+
+
+//public async Task SavePostAsync(Guid userId, Guid postId) =>
+//    await _repository.SaveAsync(userId, postId);
+
+//public async Task UnsavePostAsync(Guid userId, Guid postId) =>
+//    await _repository.UnsaveAsync(userId, postId);
+
+//public async Task<IEnumerable<Guid>> GetSavedPostsAsync(Guid userId) =>
+//    await _repository.GetByUserIdAsync(userId);
+
+
+public class SettingService : ISettingService
+{
+    private readonly ISettingRepository _repository;
+    private readonly IMapper _mapper;
+
+    public SettingService(ISettingRepository repository, IMapper mapper)
+    {
+        _repository = repository;
+        _mapper = mapper;
+    }
+
+    public async Task<SettingDto> GetUserSettingsAsync(Guid userId)
+    {
+        var settings = await _repository.GetByUserIdAsync(userId);
+        return _mapper.Map<SettingDto>(settings);
+    }
+
+    public async Task UpdateSettingsAsync(SettingDto dto)
+    {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto), "Settings cannot be null.");
+
+        var settings = _mapper.Map<Setting>(dto);
+        await _repository.UpdateAsync(settings);
+    }
+}
+
+
+//public async Task<SettingDto> GetUserSettingsAsync(Guid userId) =>
+//    _mapper.Map<SettingDto>(await _repository.GetByUserIdAsync(userId));
+
+//public async Task UpdateSettingsAsync(SettingDto dto) =>
+//    await _repository.UpdateAsync(_mapper.Map<Setting>(dto));
+
+
+
+
+
+public class UserConnectionService : IUserConnectionService
+{
+    private readonly IUserConnectionRepository _repository;
+
+    public UserConnectionService(IUserConnectionRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task ConnectAsync(Guid userId, Guid otherUserId)
+    {
+        if (userId == Guid.Empty || otherUserId == Guid.Empty)
+            throw new ArgumentException("User IDs cannot be empty.");
+
+        // Additional validation could be added here (e.g., check if users exist)
+
+        try
+        {
+            await _repository.ConnectAsync(userId, otherUserId);
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            throw new InvalidOperationException("Error while connecting users.", ex);
+        }
+    }
+
+    public async Task DisconnectAsync(Guid userId, Guid otherUserId)
+    {
+        if (userId == Guid.Empty || otherUserId == Guid.Empty)
+            throw new ArgumentException("User IDs cannot be empty.");
+
+        // Additional validation could be added here (e.g., check if users are already disconnected)
+
+        try
+        {
+            await _repository.DisconnectAsync(userId, otherUserId);
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            throw new InvalidOperationException("Error while disconnecting users.", ex);
+        }
+    }
+
+    public async Task<IEnumerable<Guid>> GetConnectionsAsync(Guid userId)
+    {
+        if (userId == Guid.Empty)
+            throw new ArgumentException("User ID cannot be empty.");
+
+        try
+        {
+            return await _repository.GetByUserIdAsync(userId);
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            throw new InvalidOperationException("Error while fetching connections.", ex);
+        }
+    }
+}
+
+
+
+//public async Task ConnectAsync(Guid userId, Guid otherUserId) =>
+//    await _repository.ConnectAsync(userId, otherUserId);
+
+//public async Task DisconnectAsync(Guid userId, Guid otherUserId) =>
+//    await _repository.DisconnectAsync(userId, otherUserId);
+
+//public async Task<IEnumerable<Guid>> GetConnectionsAsync(Guid userId) =>
+//    await _repository.GetByUserIdAsync(userId);
