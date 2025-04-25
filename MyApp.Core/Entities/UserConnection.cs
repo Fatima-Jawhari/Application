@@ -9,7 +9,7 @@ namespace MyApp1.Core.Entities
     public class UserConnection
     {
         public int Id { get; set; }
-
+        public  required string UserId { get; set; }
         public required Guid FollowerId { get; set; }
         public ApplicationUser Follower { get; set; }
 

@@ -10,6 +10,7 @@ namespace MyApp1.Infrastructure.Data
             : base(options)
         {
         }
+        
 
         public DbSet<Post> Posts { get; set; }
         public DbSet<Group> Groups { get; set; }
