@@ -17,6 +17,7 @@ namespace MyApp1.Core.Entities
         public ApplicationUser Followed { get; set; }
 
         public DateTime ConnectedAt { get; set; } = DateTime.UtcNow;
+        //add userconncetId propertie ,foreignkey
     }
 
 }

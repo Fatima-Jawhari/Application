@@ -21,17 +21,18 @@ namespace MyApp1.Infrastructure.Repositories
 
         public async Task JoinAsync(CommunityMembership communityMembership)
         {
-           _context.CommunityMembership.Add(communityMembership);
+           _context.CommunityMemberships.Add(communityMembership);
             await _context.SaveChangesAsync();
         }
 
         public async Task LeaveAsync(int id)
         {
-            var communityMembership = _context.CommunityMembership.FirstOrDefault(m => m.Id == id);
-            if (communityMembership = null) {
+            
+            var communityMembership = await _context.CommunityMemberships.FirstOrDefaultAsync(m => m.Id == id);
+            if (communityMembership == null) {
                 throw new KeyNotFoundException($"Membership not found");
             }
-            _context.CommunityMembership.Remove(communityMembership);
+            _context.CommunityMemberships.Remove(communityMembership);
             await _context.SaveChangesAsync();
         }
     }
@@ -55,6 +56,7 @@ namespace MyApp1.Infrastructure.Repositories
                 .AnyAsync(p => p.UserId == userId && p.EventId == eventId);
         }
 
+        // implement method as declared inside the interface
         public async Task JoinAsync(EventParticipant participant)
         {
             // Validate no duplicate
@@ -128,7 +130,8 @@ namespace MyApp1.Infrastructure.Repositories
 
         public async Task AddAsync(Hashtag hashtag)
         {
-            await _context.Hashtags.Add(hashtag);
+            //replaced Add with AddAsync due to using await >> async method
+            await _context.Hashtags.AddAsync(hashtag);
             await _context.SaveChangesAsync();
         }
 
@@ -294,8 +297,8 @@ namespace MyApp1.Infrastructure.Repositories
         }
 
         public async Task<Setting> GetByUserIdAsync(Guid userId)
-        {
-            return await _context.Settings.FirstOrDefaultAsync(s => s.UserId == userId);
+        {//add null check to avoid returning null values
+            return await _context.Settings.FirstOrDefaultAsync(s => s.UserId == userId.ToString());
         }
 
         public async Task UpdateAsync(Setting settings)
@@ -325,7 +328,7 @@ namespace MyApp1.Infrastructure.Repositories
         public async Task DisconnectAsync(Guid userId, Guid connectedUserId)
         {
             var connection = await _context.UserConnections
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ConnectedUserId == connectedUserId);
+                .FirstOrDefaultAsync(c => c.UserId == userId.ToString() && c.ConnectedUserId == connectedUserId.ToString());
             if (connection != null)
             {
                 _context.UserConnections.Remove(connection);
@@ -346,7 +349,7 @@ namespace MyApp1.Infrastructure.Repositories
         public async Task<IEnumerable<Guid>> GetByUserIdAsync(Guid userId)
         {
             return await _context.UserConnections
-                .Where(c => c.UserId == userId)
+                .Where(c => c.UserId == userId.ToString())
                 .Select(c => c.ConnectedUserId)
                 .ToListAsync();
         }

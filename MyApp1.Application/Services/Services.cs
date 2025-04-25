@@ -165,7 +165,7 @@ namespace MyApp1.Application.Services
 
             await _repository.AddMemberAsync(groupMember);
         }
-
+        //change the type 
         public async Task RemoveMemberAsync(Guid groupId, Guid userId)
         {
             if (groupId == Guid.Empty || userId == Guid.Empty)

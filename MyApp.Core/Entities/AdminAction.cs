@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Core.Entities
 {
-    internal class AdminAction
+    public class AdminAction
     {
+        public int Id { get; set; }
+        public  required string ActionType { get; set; }
+        public DateTime PerformedAt { get; set; }
+      
+        // Other properties...
     }
 }
