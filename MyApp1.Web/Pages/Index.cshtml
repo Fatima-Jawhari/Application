@@ -1,10 +1,122 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Floating Background Effects -->
+<div class="background-container"></div>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text-content">
+            <h1 class="hero-title">@Model.Content.Hero.Title</h1>
+            <p class="hero-subtitle">
+                @Model.Content.Hero.Subtitle
+            </p>
+
+            <div class="hero-cta">
+                <a href="@Model.Content.Hero.CallToActionLink" class="btn btn-primary" data-magnetic>
+                    <i class="fas fa-user-plus"></i> @Model.Content.Hero.CallToActionText
+                </a>
+            </div>
+
+            <div class="stats">
+                @foreach (var stat in Model.Content.Hero.Stats)
+                {
+                    <div class="stat-item">
+                        <div class="stat-number">@stat.Number</div>
+                        <div class="stat-label">@stat.Label</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="hero-image-container">
+                <img src="@Model.Content.Hero.ImageUrl" alt="@Model.Content.Hero.ImageAlt">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+    <div class="features-container">
+        <div class="section-header">
+            <h2 class="section-title">@Model.Content.FeaturesSection.Title</h2>
+            <p class="section-subtitle">
+                @Model.Content.FeaturesSection.Subtitle
+            </p>
+        </div>
+
+        <div class="features-grid">
+            @foreach (var feature in Model.Content.Features)
+            {
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="@feature.Icon"></i></div>
+                    <h3 class="feature-title">@feature.Title</h3>
+                    <p class="feature-text">@feature.Description</p>
+                    <a href="@feature.Link" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <div class="section-header">
+        <h2 class="section-title">@Model.Content.TestimonialsSection.Title</h2>
+        <p class="section-subtitle">@Model.Content.TestimonialsSection.Subtitle</p>
+    </div>
+
+    <div class="testimonial-grid">
+        @foreach (var testimonial in Model.Content.Testimonials)
+        {
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    @testimonial.Text
+                </div>
+                <div class="testimonial-author">
+                    <img src="@testimonial.AuthorImageUrl" class="author-avatar" alt="@testimonial.AuthorName">
+                    <div class="author-info">
+                        <h4>@testimonial.AuthorName</h4>
+                        <p>@testimonial.AuthorClass, @testimonial.AuthorDepartment</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="events" id="network">
+    <div class="section-header">
+        <h2 class="section-title">@Model.Content.EventsSection.Title</h2>
+        <p class="section-subtitle">@Model.Content.EventsSection.Subtitle</p>
+    </div>
+
+    <div class="events-grid">
+        @foreach (var eventItem in Model.Content.Events)
+        {
+            <div class="event-card">
+                <img src="@eventItem.ImageUrl" class="event-image" alt="@eventItem.Title">
+                <div class="event-details">
+                    <div class="event-date">@eventItem.Date.ToString("MMMM dd, yyyy")</div>
+                    <h3 class="event-title">@eventItem.Title</h3>
+                    <p class="event-description">@eventItem.Description</p>
+                    <div class="event-meta">
+                        <div class="event-location"><i class="fas fa-map-marker-alt"></i> @eventItem.Location</div>
+                        <a href="@eventItem.RsvpLink" class="btn btn-primary">RSVP</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="section-header">
+    <h2 class="section-title">@Model.Content.WhyYouniSection.Title</h2>
+    <p class="section-subtitle">
+        @Model.Content.WhyYouniSection.Subtitle
+    </p>
+</section>

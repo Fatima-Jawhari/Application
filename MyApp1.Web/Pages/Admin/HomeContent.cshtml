@@ -1,0 +1,124 @@
+@page
+@model MyApp1.Web.Pages.Admin.HomeContentModel
+@{
+    ViewData["Title"] = "Manage Home Page Content";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <h2>Manage Home Page Content</h2>
+    <p class="text-muted">This demonstrates how the homepage content can be dynamically managed.</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="post">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Hero Section</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input asp-for="Content.Hero.Title" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Subtitle</label>
+                    <textarea asp-for="Content.Hero.Subtitle" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Call to Action Text</label>
+                        <input asp-for="Content.Hero.CallToActionText" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Call to Action Link</label>
+                        <input asp-for="Content.Hero.CallToActionLink" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Statistics</h4>
+            </div>
+            <div class="card-body">
+                @for (int i = 0; i < Model.Content.Hero.Stats.Count; i++)
+                {
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Stat @(i + 1) Number</label>
+                            <input asp-for="Content.Hero.Stats[i].Number" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Stat @(i + 1) Label</label>
+                            <input asp-for="Content.Hero.Stats[i].Label" class="form-control" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Features Section</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Section Title</label>
+                    <input asp-for="Content.FeaturesSection.Title" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Section Subtitle</label>
+                    <textarea asp-for="Content.FeaturesSection.Subtitle" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Why Youni Section</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Section Title</label>
+                    <input asp-for="Content.WhyYouniSection.Title" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Section Subtitle</label>
+                    <textarea asp-for="Content.WhyYouniSection.Subtitle" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+            <a href="/" class="btn btn-secondary btn-lg">View Homepage</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .card-header {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    .btn-lg {
+        padding: 12px 30px;
+        margin: 0 10px;
+    }
+</style>

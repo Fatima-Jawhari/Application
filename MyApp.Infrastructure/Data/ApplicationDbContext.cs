@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyApp1.Core.Entities;
 
@@ -29,6 +29,13 @@ namespace MyApp1.Infrastructure.Data
         public DbSet<SavedPost> SavedPosts { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<UserConnection> UserConnections { get; set; }
+        
+        // Homepage content management
+        public DbSet<HomePageContentEntity> HomePageContents { get; set; }
+        public DbSet<StatItemEntity> StatItems { get; set; }
+        public DbSet<FeatureCardEntity> FeatureCards { get; set; }
+        public DbSet<TestimonialCardEntity> TestimonialCards { get; set; }
+        public DbSet<EventCardEntity> EventCards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

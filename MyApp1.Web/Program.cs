@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyApp1.Infrastructure.Data;
+using MyApp1.Core.Interfaces;
+using MyApp1.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Register application services
+builder.Services.AddScoped<IHomePageService, HomePageService>();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
