@@ -1,10 +1,201 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Floating Background Effects -->
+<div class="background-container"></div>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text-content">
+            <h1 class="hero-title">Reconnect with Your University Community</h1>
+            <p class="hero-subtitle">
+                Youni is the  platform for graduates to network,
+                collaborate, and maintain lifelong connections with their alma mater.
+            </p>
+
+            <div class="hero-cta">
+                <a href="#" class="btn btn-primary" data-magnetic>
+                    <i class="fas fa-user-plus"></i> Join Now
+                </a>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Alumni Connected</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Events Yearly</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Career Opportunities</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="hero-image-container">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1471&q=80" alt="Alumni networking">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+    <div class="features-container">
+        <div class="section-header">
+            <h2 class="section-title">Platform Features</h2>
+            <p class="section-subtitle">
+                Built with precision and care—Youni brings the spirit of Friendship to alumni networking
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-users"></i></div>
+                <h3 class="feature-title">Networking Hub</h3>
+                <p class="feature-text">Connect with alumni from various faculties, years, and regions.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                <h3 class="feature-title">Event Management</h3>
+                <p class="feature-text">Discover and RSVP to reunions, conferences, and meetups.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-briefcase"></i></div>
+                <h3 class="feature-title">Career Center</h3>
+                <p class="feature-text">Access exclusive opportunities shared by alumni and partners.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                <h3 class="feature-title">Direct Messaging</h3>
+                <p class="feature-text">1:1 or group chats with real-time messaging and video support.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-newspaper"></i></div>
+                <h3 class="feature-title">Alumni Newsfeed</h3>
+                <p class="feature-text">Stay updated with academic and professional milestones.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+                <h3 class="feature-title">Mentorship Program</h3>
+                <p class="feature-text">Support or receive guidance in a structured mentor-mentee system.</p>
+                <a href="#" class="feature-link">Learn more <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials">
+    <div class="section-header">
+        <h2 class="section-title">Success Stories</h2>
+        <p class="section-subtitle">Real alumni. Real connections. Real impact.</p>
+    </div>
+
+    <div class="testimonial-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-text">
+                I found my old project team on Elevana—now we're running a funded startup!
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="author-avatar" alt="Ali H.">
+                <div class="author-info">
+                    <h4>Ali H.</h4>
+                    <p>Class of 2013, Engineering</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <div class="testimonial-text">
+                The mentorship feature helped me land my first job after graduation.
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="author-avatar" alt="Lina Z.">
+                <div class="author-info">
+                    <h4>Lina Z.</h4>
+                    <p>Class of 2020, Business</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <div class="testimonial-text">
+                It's amazing to stay connected with students and alumni across the world.
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/men/75.jpg" class="author-avatar" alt="Dr. Marwan K.">
+                <div class="author-info">
+                    <h4>Dr. Marwan K.</h4>
+                    <p>Faculty, Computer Science</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="events" id="network">
+    <div class="section-header">
+        <h2 class="section-title">Upcoming Events</h2>
+        <p class="section-subtitle">Opportunities to engage, learn, and grow.</p>
+    </div>
+
+    <div class="events-grid">
+        <div class="event-card">
+            <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1470&q=80" class="event-image" alt="Reunion">
+            <div class="event-details">
+                <div class="event-date">August 15, 2025</div>
+                <h3 class="event-title">Annual Alumni Reunion</h3>
+                <p class="event-description">Reconnect and relive the best moments with peers and faculty.</p>
+                <div class="event-meta">
+                    <div class="event-location"><i class="fas fa-map-marker-alt"></i> University Main Hall</div>
+                    <a href="#" class="btn btn-primary">RSVP</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-card">
+            <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1470&q=80" class="event-image" alt="Career Fair">
+            <div class="event-details">
+                <div class="event-date">September 10, 2025</div>
+                <h3 class="event-title">Global Alumni Career Fair</h3>
+                <p class="event-description">Top hiring companies with exclusive offers for Youni users.</p>
+                <div class="event-meta">
+                    <div class="event-location"><i class="fas fa-map-marker-alt"></i> Online / In-Person Hybrid</div>
+                    <a href="#" class="btn btn-primary">RSVP</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-card">
+            <img src="https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1469&q=80" class="event-image" alt="Mentorship">
+            <div class="event-details">
+                <div class="event-date">October 1, 2025</div>
+                <h3 class="event-title">Mentorship Mixer</h3>
+                <p class="event-description">Match with a mentor or mentee during this guided networking session.</p>
+                <div class="event-meta">
+                    <div class="event-location"><i class="fas fa-map-marker-alt"></i> Innovation Center</div>
+                    <a href="#" class="btn btn-primary">RSVP</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-header">
+    <h2 class="section-title">Why Youni ?</h2>
+    <p class="section-subtitle">
+        Youni bridges the gap between past and future—alumni, mentors, and professionals under one platform.
+    </p>
+</section>

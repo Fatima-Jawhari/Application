@@ -1,19 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MyApp1.Web</title>
+    <title>@ViewData["Title"] - Youni</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MyApp1.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/yy/feather.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">MyApp1.Web</a>
+                <a class="navbar-brand" asp-area="" asp-page="/Index">Youni</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -32,17 +33,56 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main role="main">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - MyApp1.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>
+    @{
+        var footerData = ViewContext.ViewData.Model is MyApp1.Web.Pages.IndexModel indexModel 
+            ? indexModel.Footer 
+            : new MyApp1.Web.Pages.FooterData 
+            { 
+                CompanyName = "Youni", 
+                Description = "Connecting alumni worldwide through innovation and community.",
+                CopyrightYear = DateTime.Now.Year,
+                ContactInfo = new MyApp1.Web.Pages.ContactInfo
+                {
+                    Email = "contact@youni.com",
+                    Phone = "+1 (555) 123-4567",
+                    Address = "123 University Ave, Alumni City, AC 12345"
+                },
+                QuickLinks = new List<MyApp1.Web.Pages.FooterLink>
+                {
+                    new MyApp1.Web.Pages.FooterLink { Title = "About Us", Url = "/about" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "Features", Url = "#features" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "Events", Url = "#network" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "Contact", Url = "/contact" }
+                },
+                SupportLinks = new List<MyApp1.Web.Pages.FooterLink>
+                {
+                    new MyApp1.Web.Pages.FooterLink { Title = "Help Center", Url = "/help" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "Privacy Policy", Url = "/privacy" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "Terms of Service", Url = "/terms" },
+                    new MyApp1.Web.Pages.FooterLink { Title = "FAQ", Url = "/faq" }
+                },
+                SocialLinks = new List<MyApp1.Web.Pages.SocialLink>
+                {
+                    new MyApp1.Web.Pages.SocialLink { Platform = "Facebook", Url = "https://facebook.com/youni", Icon = "fab fa-facebook-f" },
+                    new MyApp1.Web.Pages.SocialLink { Platform = "Twitter", Url = "https://twitter.com/youni", Icon = "fab fa-twitter" },
+                    new MyApp1.Web.Pages.SocialLink { Platform = "LinkedIn", Url = "https://linkedin.com/company/youni", Icon = "fab fa-linkedin-in" },
+                    new MyApp1.Web.Pages.SocialLink { Platform = "Instagram", Url = "https://instagram.com/youni", Icon = "fab fa-instagram" }
+                },
+                Statistics = new List<MyApp1.Web.Pages.StatisticItem>
+                {
+                    new MyApp1.Web.Pages.StatisticItem { Value = "10K+", Label = "Alumni Connected" },
+                    new MyApp1.Web.Pages.StatisticItem { Value = "500+", Label = "Events Yearly" },
+                    new MyApp1.Web.Pages.StatisticItem { Value = "100+", Label = "Career Opportunities" },
+                    new MyApp1.Web.Pages.StatisticItem { Value = "50+", Label = "Universities" }
+                }
+            };
+    }
+    
+    <partial name="_Footer" model="footerData" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
