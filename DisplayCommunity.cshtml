@@ -1,0 +1,1749 @@
+@model AppProject.Services.DTOs.CommunityDetailsDto
+@using AppProject.Core.Entities
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    Layout = "_UserLayout";
+    var CommunityUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Url.Action("DisplayOne", "Community", new { communityId = Model.CommunityId })}";
+    var isUniversity = Model.Type?.Equals("University", StringComparison.OrdinalIgnoreCase) ?? false;
+    var relatedCommunities = ViewBag.RelatedCommunities as List<Community>;
+}
+
+@section Styles {
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-teal: #0891b2;
+            --primary-teal-dark: #0e7490;
+            --primary-teal-light: #67e8f9;
+            --primary-teal-ultra-light: #cffafe;
+            --teal-gradient: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #67e8f9 100%);
+            --teal-glow: rgba(8, 145, 178, 0.15);
+            --surface-white: #ffffff;
+            --surface-light: #f8fafc;
+            --surface-card: #f1f5f9;
+            --surface-elevated: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-light: rgba(8, 145, 178, 0.08);
+            --border-medium: rgba(8, 145, 178, 0.15);
+            --shadow-soft: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-teal: 0 8px 25px -5px rgba(8, 145, 178, 0.2);
+            --border-radius: 12px;
+            --border-radius-lg: 20px;
+            --border-radius-xl: 24px;
+            --backdrop-blur: blur(16px);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 400;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Button Styles */
+        .btn-icon {
+            background: var(--teal-gradient);
+            border: none;
+            padding: 16px;
+            border-radius: 50%;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 20px;
+            width: 52px;
+            height: 52px;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .btn-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-icon:hover::before {
+            opacity: 1;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: var(--shadow-teal);
+        }
+
+        .btn-icon:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        /* Enhanced Layout */
+        .feed-body {
+            margin-left: 300px;
+            padding: 32px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, transparent 0%, rgba(8, 145, 178, 0.02) 100%);
+        }
+
+        .rightnavigation {
+            position: fixed;
+            right: 0;
+            width: 300px;
+            top: 0;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 1px solid var(--border-light);
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .main-content.right-chat-active {
+            margin-right: 300px;
+            margin-left: 0;
+            width: calc(100vw - 300px);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Enhanced Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, white 0%, #fafbfb 100%);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-large);
+            padding: 48px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--teal-gradient);
+        }
+
+        .profile-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Enhanced Profile Picture */
+        .profile-pic-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 24px;
+        }
+
+        .profile-pic-container::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            background: var(--teal-gradient);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.15;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.15;
+            }
+            50% {
+                transform: scale(1.08);
+                opacity: 0.25;
+            }
+        }
+
+        .profile-pic-container img {
+            border: 6px solid white;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-pic-container:hover img {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-teal);
+        }
+
+        /* Enhanced Typography */
+        .profile-username {
+            background: var(--teal-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* Enhanced Buttons */
+        .btn-primary {
+            background: var(--teal-gradient);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 28px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            letter-spacing: 0.025em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-teal);
+            background: linear-gradient(135deg, var(--primary-teal-dark) 0%, var(--primary-teal) 100%);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-teal);
+            color: var(--primary-teal);
+            border-radius: var(--border-radius);
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 15px;
+            background: transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.025em;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-teal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-teal);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid var(--text-muted);
+            color: var(--text-secondary);
+            border-radius: var(--border-radius);
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 15px;
+            background: transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.025em;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--text-secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-teal {
+            background: var(--teal-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 14px 24px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            letter-spacing: 0.025em;
+        }
+
+        .btn-teal:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-teal);
+            color: white;
+        }
+
+        /* Enhanced Dropdown */
+        .dropdown-menu {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: var(--backdrop-blur);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .dropdown-item {
+            border-radius: var(--border-radius);
+            padding: 14px 18px;
+            margin-bottom: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .dropdown-item:hover {
+            background: var(--teal-glow);
+            color: var(--primary-teal);
+            transform: translateX(6px);
+        }
+
+        .scrollable-dropdown {
+            max-height: 240px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-teal) var(--surface-light);
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar-track {
+            background: var(--surface-light);
+            border-radius: 3px;
+        }
+
+        .scrollable-dropdown::-webkit-scrollbar-thumb {
+            background: var(--teal-gradient);
+            border-radius: 3px;
+        }
+
+        /* Enhanced Member Count */
+        #memberCount {
+            background: var(--teal-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* Enhanced Cards */
+        .card {
+            background: linear-gradient(135deg, white 0%, #fafbfb 100%);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-medium);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--teal-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Enhanced Avatar */
+        .avatar img {
+            border: 3px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .avatar:hover img {
+            border-color: var(--primary-teal);
+            transform: scale(1.08);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Enhanced Links */
+        .card h4 a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .card h4 a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--teal-gradient);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 2px;
+        }
+
+        .card h4 a:hover::after {
+            width: 100%;
+        }
+
+        .card h4 a:hover {
+            color: var(--primary-teal);
+        }
+
+        /* Enhanced Action Buttons */
+        .card-body .d-flex a {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: var(--border-radius);
+            padding: 10px 14px;
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .card-body .d-flex a:hover {
+            background: var(--teal-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Interaction Buttons */
+        .like-btn .toggle-heart,
+        .save-btn .toggle-save {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .like-btn:hover .toggle-heart {
+            transform: scale(1.3);
+        }
+
+        .save-btn:hover .toggle-save {
+            transform: scale(1.2);
+        }
+
+        /* Enhanced Share Catalog */
+        .share-catalog {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            width: 320px;
+            z-index: 1000;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+            padding: 24px;
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        .copy-link-input {
+            background: var(--surface-light) !important;
+            border: 2px solid var(--border-light) !important;
+            border-radius: var(--border-radius) !important;
+            padding: 14px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .copy-link-input:focus {
+            border-color: var(--primary-teal) !important;
+            box-shadow: 0 0 0 4px var(--teal-glow) !important;
+            background: white !important;
+        }
+
+        .copy-icon {
+            background: var(--teal-gradient);
+            color: white !important;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .copy-icon:hover {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Enhanced Empty State */
+        .text-center.text-muted h5 {
+            color: var(--text-muted);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .text-center.text-muted::before {
+            content: '📝';
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 1.5rem;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Enhanced Comments Popup */
+        .comments-popup {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            height: 80vh;
+            overflow: hidden;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1050;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius-xl);
+            border: none;
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: var(--backdrop-blur);
+            animation: slideInScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .comments-header {
+            position: sticky;
+            top: 0;
+            background: var(--teal-gradient);
+            padding: 28px;
+            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+            border-bottom: none;
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(8, 145, 178, 0.15);
+        }
+
+        .comments-header h5 {
+            color: white;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.3rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.025em;
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 22px;
+            right: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .close-popup:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .close-popup::before {
+            content: "✕";
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Enhanced Comments List */
+        .comments-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 28px;
+            margin: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-teal) transparent;
+        }
+
+        .comments-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comments-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .comments-list::-webkit-scrollbar-thumb {
+            background: var(--teal-gradient);
+            border-radius: 4px;
+        }
+
+        .comment-item {
+            position: relative;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: var(--surface-light);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .comment-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--primary-teal);
+            background: white;
+        }
+
+        .comment-item img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--border-light);
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-item:hover img {
+            border-color: var(--primary-teal);
+        }
+
+        .comment-item strong {
+            color: var(--primary-teal);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .comment-date {
+            font-size: 13px;
+            color: var(--text-muted);
+            position: absolute;
+            bottom: 20px;
+            right: 24px;
+            background: var(--teal-glow);
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        /* Enhanced Comment Input */
+        .comment-input-container {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 28px;
+            border-top: 1px solid var(--border-light);
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            display: flex;
+            align-items: flex-end;
+            gap: 18px;
+            z-index: 10;
+            box-shadow: 0 -4px 20px rgba(8, 145, 178, 0.08);
+            backdrop-filter: var(--backdrop-blur);
+        }
+
+        textarea.comment-textarea {
+            flex-grow: 1;
+            resize: none;
+            min-height: 52px;
+            max-height: 140px;
+            overflow-y: auto;
+            padding: 18px 22px;
+            font-size: 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 26px;
+            background: var(--surface-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        textarea.comment-textarea:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            background: white;
+            box-shadow: 0 0 0 4px var(--teal-glow);
+        }
+
+        textarea.comment-textarea::placeholder {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        button.send-btn {
+            width: 52px;
+            height: 52px;
+            padding: 0;
+            border-radius: 50%;
+            background: var(--teal-gradient);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        button.send-btn:hover {
+            transform: translateY(-3px) scale(1.08);
+            box-shadow: var(--shadow-teal);
+        }
+
+        button.send-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        button.send-btn svg {
+            color: white;
+            width: 22px;
+            height: 22px;
+            margin-left: 2px;
+        }
+
+        /* Enhanced Backdrop */
+        .comments-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1049;
+            backdrop-filter: blur(12px);
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .feed-body {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .profile-card {
+                padding: 28px;
+                margin: 20px;
+            }
+
+            .profile-username {
+                font-size: 2rem;
+            }
+
+            .btn-icon {
+                width: 48px;
+                height: 48px;
+                padding: 14px;
+            }
+
+            .comments-popup {
+                width: 95%;
+                height: 90vh;
+                border-radius: var(--border-radius-lg);
+            }
+        }
+
+        /* Enhanced Spinner */
+        .spinner-border {
+            color: var(--primary-teal);
+        }
+
+        /* Enhanced Focus States */
+        button:focus-visible,
+        .btn:focus-visible {
+            outline: 3px solid var(--primary-teal);
+            outline-offset: 3px;
+        }
+
+        /* Enhanced Selection */
+        ::selection {
+            background: var(--teal-glow);
+            color: var(--primary-teal);
+        }
+
+        /* Enhanced Transitions */
+        * {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                       box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Loading Animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(
+                90deg,
+                var(--surface-light) 0px,
+                rgba(8, 145, 178, 0.08) 40px,
+                var(--surface-light) 80px
+            );
+            background-size: 200px 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        /* Enhanced Glass Effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Enhanced Notification */
+        .notification-popup {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--teal-gradient);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            font-weight: 600;
+            font-size: 15px;
+            z-index: 9999;
+            transform: translateX(400px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .notification-popup.show {
+            transform: translateX(0);
+        }
+
+        .notification-popup.hide {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    </style>
+}
+
+<div class="container mt-5 profiledisplaybody position-relative">
+    <input type="hidden" id="__RequestVerificationToken" value="@Antiforgery.GetTokens(Context).RequestToken" />
+
+    <div class="profile-card">
+        <div class="d-flex justify-content-center mb-4">
+            <div class="profile-pic-container">
+                <img src="@Model.PictureUrl" alt="@Model.Name" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="text-center mb-2">
+            <h3 class="profile-username fw-bold">@Model.Name</h3>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="text-center mb-3 text-muted px-4">
+                <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text-secondary);">@Model.Description</p>
+            </div>
+        }
+
+        <div class="text-center mb-4">
+            <span id="memberCount" class="fw-semibold text-primary">@Model.MemberCount</span>
+            <span class="text-muted" style="font-size: 1.1rem; font-weight: 500;">Members</span>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center gap-3 mb-4 flex-wrap">
+            <a href="javascript:void(0);" class="join-btn btn btn-sm @(Model.IsCurrentUserMember ? "btn-outline-primary" : "btn-primary")" data-community-id="@Model.CommunityId">
+                @(Model.IsCurrentUserMember ? "Leave" : "Join")
+            </a>
+
+            @if (Model.IsCurrentUserMember)
+            {
+                <form method="post" asp-action="StartConversation" style="display:inline;" id="groupChatForm">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Group Chat</button>
+                </form>
+            }
+            else
+            {
+                <form method="post" asp-action="StartConversation" style="display:inline; display:none;" id="groupChatForm">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Group Chat</button>
+                </form>
+            }
+
+            <div class="btn-icon" title="Events">
+                <i data-feather="calendar" style="color: white;"></i>
+            </div>
+
+            @if (Model.IsCurrentUserMember && !Model.Type.Equals("University", StringComparison.OrdinalIgnoreCase))
+            {
+                <a href="@Url.Action("CreatePost", "Community", new { communityId = Model.CommunityId })">
+                    <button id="addPostBtn" class="btn-icon" title="Add Post">
+                        <i data-feather="plus"></i>
+                    </button>
+                </a>
+            }
+
+            @if (isUniversity && relatedCommunities != null && relatedCommunities.Any())
+            {
+                <div class="dropdown mb-3 text-center">
+                    <button class="btn btn-teal dropdown-toggle" type="button" id="relatedCommunitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Majors Communities
+                    </button>
+                    <ul class="dropdown-menu text-start scrollable-dropdown" aria-labelledby="relatedCommunitiesDropdown">
+                        @foreach (var community in relatedCommunities)
+                        {
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="@Url.Action("DisplayOne", "Community", new { communityId = community.CommunityId })">
+                                    <img src="@community.PictureUrl" alt="Image" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                                    <span>@community.Name</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <a href="#" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti-more-alt text-grey-900 btn-round-md bg-greylight font-xss"></i>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-end p-4 rounded-xxl border-0 shadow-lg" aria-labelledby="dropdownMenu2">
+                <a href="#" id="copyCommunityLink" class="d-flex align-items-center fw-600 text-grey-900 text-dark lh-26 font-xssss" data-url="@CommunityUrl">
+                    <span class="d-none-xss">Share Community</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="feedInterface" class="row feed-body">
+    <div class="col-xl-10 col-xxl-10 col-lg-10">
+        @if (Model.Posts == null || !Model.Posts.Any())
+        {
+            <div class="text-center text-muted my-5">
+                <h5>No Posts Yet</h5>
+                <p style="color: var(--text-light); font-size: 1.1rem;">Be the first to share something with the community!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var post in Model.Posts)
+            {
+                <div class="card w-100 shadow-xss rounded-xxl border-0 p-4 mb-3">
+                    <div class="card-body p-0 d-flex">
+                        <figure class="avatar me-3">
+                            <img src="@post.ProfilePictureUrl" alt="image" class="shadow-sm rounded-circle" style="width: 45px; height: 45px; object-fit: cover;" />
+                        </figure>
+                        <h4 class="fw-700 text-grey-900 font-xssss mt-1">
+                            <a href="@Url.Action("Display", "Profile", new { id = post.UserId })">@post.Username</a>
+                            <span class="d-block font-xssss fw-500 mt-1 lh-3 text-grey-500">
+                                @post.CreatedAt.ToString("MMM dd, yyyy - hh:mm tt")
+                            </span>
+                        </h4>
+                        <a href="#" class="ms-auto" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ti-more-alt text-grey-900 btn-round-md bg-greylight font-xss"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-4 rounded-xxl border-0 shadow-lg" aria-labelledby="dropdownMenu2">
+                            <a href="#" class="d-flex align-items-center fw-600 text-grey-900 text-dark lh-26 font-xssss report-link" data-post-id="@post.PostId">
+                                <i class="feather-flag text-danger btn-round-sm font-lg"></i>
+                                <span class="d-none-xss">Report</span>
+                            </a>
+
+                            @if (post.UserId == (string)ViewBag.CurrentUserId)
+                            {
+                                <form asp-controller="Home" asp-action="DeletePost" method="post" class="m-0 p-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@post.PostId" />
+                                    <button type="submit" class="dropdown-item text-danger fw-600 font-xssss" onclick="return confirm('Are you sure you want to delete this post?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(post.MediaUrl))
+                    {
+                        <div class="card-body d-block p-0">
+                            <div class="row ps-2 pe-2">
+                                <div class="col-xs-12 col-sm-12 p-1">
+                                    @if (post.MediaType == "video")
+                                    {
+                                        <video class="rounded-3 w-100" controls>
+                                            <source src="@post.MediaUrl" type="video/mp4" />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    }
+                                    else
+                                    {
+                                        <a href="@post.MediaUrl" data-lightbox="roadtrip">
+                                            <img src="@post.MediaUrl" class="rounded-3 w-100" alt="image" />
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="card-body p-0 me-lg-5">
+                        <p class="fw-600 text-grey-800 lh-28 font-xssss w-100">
+                            @post.Content
+                        </p>
+                    </div>
+
+                    <div class="card-body d-flex p-0 mt-3">
+                        <div class="d-flex align-items-center fw-600 text-grey-900 text-dark lh-26 font-xssss me-2">
+                            <a href="javascript:void(0);" class="like-btn d-flex align-items-center" data-post-id="@post.PostId">
+                                <i class="bi font-xss fs-1 toggle-heart @(post.IsLikedByCurrentUser ? "bi-heart-fill text-danger" : "bi-heart")"></i>
+                            </a>
+                            <span class="ms-1 like-count clickable" data-post-id="@post.PostId">@post.LikeCount</span>
+                        </div>
+
+                        <a href="#" class="d-flex align-items-center fw-600 text-grey-900 text-dark lh-26 font-xssss comment-link" data-post-id="@post.PostId">
+                            <i class="feather-message-circle text-dark text-grey-900 btn-round-sm font-lg"></i>
+                            <span class="d-none-xss comment-count" data-post-id="@post.PostId">@post.CommentCount Comment</span>
+                        </a>
+
+                        <a href="javascript:void(0);" class="save-btn d-flex align-items-center ms-3 me-*" data-post-id="@post.PostId" title="Save post">
+                            <i class="bi font-xss fs-1 toggle-save @(post.IsSavedByCurrentUser ? "bi-bookmark-fill text-dark" : "bi-bookmark")"></i>
+                        </a>
+
+                        <div class="share-wrapper position-relative">
+                            <a href="#" class="shareBtn ms-auto d-flex align-items-center fw-600 text-grey-900 text-dark lh-26 font-xssss" data-postid="@post.PostId">
+                                <i class="feather-share-2 text-grey-900 text-dark btn-round-sm font-lg ms-1"></i>
+                                <span class="d-none-xs ms-1">Share</span>
+                            </a>
+
+                            <div class="shareCatalog share-catalog rounded-xxl shadow-lg p-3" style="display: none;" data-postid="@post.PostId">
+                                <h4 class="fw-700 font-xssss text-grey-500 mb-2">Copy Link</h4>
+                                <div class="d-flex align-items-center">
+                                    <input type="text" readonly value="@Url.Action("Show", "Post", new { postId = post.PostId }, protocol: Context.Request.Scheme)" class="copy-link-input bg-grey text-grey-500 font-xssss border-0 lh-32 p-2 fw-600 rounded-3 w-100 me-2" />
+                                    <i class="feather-copy font-xs text-grey-500 copy-icon" style="cursor: pointer;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>feather.replace();</script>
+
+    <script>
+        // Enhanced notification function
+        function showNotification(message, type = 'success', duration = 3000) {
+            const notification = document.createElement("div");
+            notification.className = `notification-popup ${type}`;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // Trigger show animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide after specified duration
+            setTimeout(() => {
+                notification.classList.add('hide');
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
+        }
+
+        // Enhanced copy to clipboard functionality
+        document.getElementById("copyCommunityLink").addEventListener("click", function(e) {
+            e.preventDefault();
+            const url = this.getAttribute("data-url");
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification("Community URL copied to clipboard! 🎉");
+            }).catch(err => {
+                showNotification("Failed to copy the URL", 'error');
+            });
+        });
+
+        // Enhanced loading states
+        function showLoading(element) {
+            const originalContent = element.innerHTML;
+            element.innerHTML = `<div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading...`;
+            element.disabled = true;
+            return originalContent;
+        }
+
+        function hideLoading(element, originalContent) {
+            element.innerHTML = originalContent;
+            element.disabled = false;
+        }
+    </script>
+
+    <script>
+        $(document).on('click', '.join-btn', function() {
+            const $btn = $(this);
+            const communityId = $btn.data('community-id');
+            const token = $('#__RequestVerificationToken').val();
+            
+            const originalContent = showLoading($btn[0]);
+            
+            $.ajax({
+                url: '@Url.Action("ToggleJoin", "Community")',
+                type: 'POST',
+                data: { communityId: communityId, __RequestVerificationToken: token },
+                success: function(res) {
+                    if (res.joining) {
+                        $btn.removeClass('btn-primary').addClass('btn-outline-primary').text('Leave');
+                        $('#groupChatForm').show();
+                        $('#addPostBtn').show();
+                        showNotification("Welcome to the community! 🎉");
+                    } else {
+                        $btn.removeClass('btn-outline-primary').addClass('btn-primary').text('Join');
+                        $('#groupChatForm').hide();
+                        $('#addPostBtn').hide();
+                        showNotification("You've left the community", 'info');
+                    }
+                    $('#memberCount').text(res.memberCount);
+                },
+                error: function() {
+                    showNotification("Failed to update community membership", 'error');
+                },
+                complete: function() {
+                    hideLoading($btn[0], $btn.hasClass('btn-outline-primary') ? 'Leave' : 'Join');
+                }
+            });
+        });
+    </script>
+
+    <script src="~/js/plugin.js"></script>
+    <script src="~/js/lightbox.js"></script>
+    <script src="~/js/scripts.js"></script>
+    <script src="https://meet.jit.si/external_api.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const shareButtons = document.querySelectorAll(".shareBtn");
+            const copyIcons = document.querySelectorAll(".copy-icon");
+
+            shareButtons.forEach(btn => {
+                btn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll(".shareCatalog").forEach(catalog => {
+                        if (catalog !== btn.parentElement.querySelector('.shareCatalog')) {
+                            catalog.style.display = "none";
+                        }
+                    });
+                    const catalog = btn.parentElement.querySelector('.shareCatalog');
+                    if (!catalog) return;
+                    catalog.style.display = (catalog.style.display === "block") ? "none" : "block";
+                });
+            });
+
+            copyIcons.forEach(icon => {
+                icon.addEventListener("click", function() {
+                    const input = icon.closest(".shareCatalog").querySelector(".copy-link-input");
+                    input.select();
+                    input.setSelectionRange(0, 99999);
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(input.value).then(() => {
+                            showNotification("Link copied to clipboard! 📋");
+                            // Visual feedback
+                            const originalBackground = icon.style.background;
+                            icon.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+                            icon.style.transform = "scale(1.2)";
+                            setTimeout(() => {
+                                icon.style.background = originalBackground;
+                                icon.style.transform = "scale(1)";
+                            }, 300);
+                        });
+                    } else {
+                        try {
+                            document.execCommand("copy");
+                            showNotification("Link copied! 📋");
+                        } catch {
+                            showNotification("Copy not supported", 'error');
+                        }
+                    }
+                });
+            });
+
+            document.addEventListener("click", function(event) {
+                if (!event.target.closest(".share-wrapper")) {
+                    document.querySelectorAll(".shareCatalog").forEach(catalog => {
+                        catalog.style.display = "none";
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.like-btn', function() {
+            const $btn = $(this);
+            const postId = $btn.data('post-id');
+            const $icon = $btn.find('.toggle-heart');
+            const $count = $(`.like-count[data-post-id="${postId}"]`);
+            
+            // Optimistic UI update
+            const isCurrentlyLiked = $icon.hasClass('bi-heart-fill');
+            if (isCurrentlyLiked) {
+                $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                $count.text(parseInt($count.text()) - 1);
+            } else {
+                $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                $count.text(parseInt($count.text()) + 1);
+            }
+            
+            $.post('@Url.Action("ToggleLike", "Home")', { postId: postId }, function(res) {
+                // Update with actual server response
+                if (res.liked) {
+                    $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                } else {
+                    $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                }
+                $count.text(res.likeCount);
+            }).fail(function() {
+                // Revert on failure
+                if (isCurrentlyLiked) {
+                    $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                    $count.text(parseInt($count.text()) + 1);
+                } else {
+                    $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                    $count.text(parseInt($count.text()) - 1);
+                }
+                showNotification("Failed to update like status", 'error');
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.like-count.clickable', function(e) {
+                e.stopPropagation();
+                const postId = $(this).data('post-id');
+                if (!postId) {
+                    showNotification("Post ID not found!", 'error');
+                    return;
+                }
+
+                $('.likers-popup').remove();
+                const popup = $(`
+                    <div class="likers-popup shadow rounded bg-white border glass-effect" 
+                         style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1050;width:90%;max-width:600px;height:400px;overflow:hidden;border-radius:var(--border-radius-xl);box-shadow:var(--shadow-xl);animation:slideInScale 0.3s ease-out;">
+                        <div style="background:var(--teal-gradient);padding:24px;border-radius:var(--border-radius-xl) var(--border-radius-xl) 0 0;">
+                            <h5 class="text-center mb-0" style="color:white;font-weight:700;font-size:1.2rem;">❤️ Likes</h5>
+                        </div>
+                        <div class="likers-list text-center" style="padding:28px;overflow-y:auto;height:calc(100% - 88px);">
+                            <div class="d-flex align-items-center justify-content-center loading-shimmer" style="min-height:60px;border-radius:12px;">
+                                <div class="spinner-border spinner-border-sm me-2" role="status" style="color:var(--primary-teal);"></div>
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $('body').append(popup);
+
+                $.get('@Url.Action("GetLikersForPost", "Home")', { postId: postId }, function(likers) {
+                    const listContainer = popup.find('.likers-list');
+                    if (!likers || likers.length === 0) {
+                        listContainer.html(`
+                            <div class="text-center text-muted">
+                                <div style="font-size:4rem;margin-bottom:16px;opacity:0.6;">💔</div>
+                                <div style="font-size:18px;font-weight:600;color:var(--text-secondary);">No likes yet</div>
+                                <div style="font-size:14px;color:var(--text-muted);margin-top:8px;">Be the first to show some love!</div>
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    const list = $('<ul class="list-unstyled mb-0"></ul>');
+                    likers.forEach(liker => {
+                        const img = liker.profilePictureUrl || '/images/default-profile.png';
+                        list.append(`
+                            <li class="d-flex align-items-center mb-3" style="padding:16px;border-radius:var(--border-radius);transition:all 0.3s ease;border:1px solid var(--border-light);">
+                                <img src="${img}" class="rounded-circle me-3" style="width:48px;height:48px;object-fit:cover;border:3px solid var(--border-light);">
+                                <span class="fw-semibold" style="color:var(--text-primary);font-size:16px;">${liker.username}</span>
+                            </li>
+                        `);
+                    });
+                    listContainer.html(list);
+                    
+                    list.find('li').hover(function() {
+                        $(this).css({
+                            'background': 'var(--surface-light)',
+                            'transform': 'translateX(4px)',
+                            'border-color': 'var(--primary-teal)'
+                        });
+                    }, function() {
+                        $(this).css({
+                            'background': 'transparent',
+                            'transform': 'translateX(0)',
+                            'border-color': 'var(--border-light)'
+                        });
+                    });
+                }).fail(function() {
+                    popup.find('.likers-list').html(`
+                        <div class="text-center text-muted">
+                            <div style="color:#ef4444;font-size:18px;">❌ Failed to load likes</div>
+                            <div style="font-size:14px;margin-top:8px;color:var(--text-muted);">Please try again later</div>
+                        </div>
+                    `);
+                });
+
+                $(window).on('scroll.likersPopup', function() {
+                    popup.remove();
+                    $(window).off('scroll.likersPopup');
+                    $(document).off('click.likersPopup');
+                });
+
+                $(document).on('click.likersPopup', function() {
+                    popup.remove();
+                    $(window).off('scroll.likersPopup');
+                    $(document).off('click.likersPopup');
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.comment-link', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const postId = $(this).data('post-id');
+
+                $('.comments-popup, .comments-backdrop').remove();
+                const backdrop = $('<div class="comments-backdrop"></div>');
+                $('body').append(backdrop);
+
+                const popup = $(`
+                    <div class="comments-popup">
+                        <div class="comments-header">
+                            <h5 class="text-center mb-0">💬 Comments</h5>
+                            <button class="close-popup"></button>
+                        </div>
+                        <ul class="comments-list">
+                            <div class="text-center text-muted d-flex align-items-center justify-content-center loading-shimmer" style="min-height:60px;border-radius:12px;margin:20px;">
+                                <div class="spinner-border spinner-border-sm me-2" role="status" style="color:var(--primary-teal);"></div>
+                                Loading comments...
+                            </div>
+                        </ul>
+                        <div class="comment-input-container">
+                            <textarea class="comment-textarea" placeholder="Share your thoughts..." rows="1"></textarea>
+                            <button class="btn send-btn" title="Send comment" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                    <path d="m22 2-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `);
+                $('body').append(popup);
+
+                function closePopup() {
+                    popup.fadeOut(200, function() {
+                        popup.remove();
+                        backdrop.remove();
+                    });
+                }
+
+                popup.find('.close-popup').on('click', closePopup);
+                backdrop.on('click', closePopup);
+                $(document).on('keydown.commentPopup', function(e) {
+                    if (e.key === 'Escape') {
+                        closePopup();
+                        $(document).off('keydown.commentPopup');
+                    }
+                });
+
+                popup.find('.comment-textarea').on('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+                });
+
+                function loadComments() {
+                    $.get('@Url.Action("GetCommentsForPost", "Home")', { postId }, function(comments) {
+                        if (!comments || comments.length === 0) {
+                            popup.find('.comments-list').html(`
+                                <div class="text-center text-muted" style="padding:40px;">
+                                    <div style="font-size:4rem;margin-bottom:16px;opacity:0.6;">💭</div>
+                                    <div style="font-size:18px;font-weight:600;color:var(--text-secondary);">No comments yet</div>
+                                    <div style="font-size:14px;opacity:0.8;margin-top:8px;color:var(--text-muted);">Be the first to share your thoughts!</div>
+                                </div>
+                            `);
+                            return;
+                        }
+
+                        const list = $('<ul class="list-unstyled mb-0"></ul>');
+                        comments.forEach(comment => {
+                            const img = comment.profilePictureUrl || '/images/default-profile.png';
+                            const date = new Date(comment.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            list.append(`
+                                <li class="comment-item">
+                                    <div class="d-flex align-items-start">
+                                        <img src="${img}" class="me-3" alt="${comment.username}">
+                                        <div style="flex-grow:1;position:relative;padding-bottom:28px;">
+                                            <strong>${comment.username}</strong>
+                                            <div style="margin-top:6px;color:var(--text-secondary);line-height:1.6;font-size:15px;">${comment.content}</div>
+                                            <div class="comment-date">${date}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            `);
+                        });
+                        popup.find('.comments-list').html(list);
+                        const commentsList = popup.find('.comments-list')[0];
+                        commentsList.scrollTop = commentsList.scrollHeight;
+                    }).fail(function() {
+                        popup.find('.comments-list').html(`
+                            <div class="text-center text-muted" style="padding:40px;">
+                                <div style="color:#ef4444;font-size:18px;">❌ Failed to load comments</div>
+                                <div style="font-size:14px;margin-top:12px;color:var(--text-muted);">Please try again later</div>
+                            </div>
+                        `);
+                    });
+                }
+
+                loadComments();
+
+                function sendComment() {
+                    const content = popup.find('textarea').val().trim();
+                    if (!content) return;
+
+                    const $sendBtn = popup.find('.send-btn');
+                    const $textarea = popup.find('textarea');
+                    
+                    $sendBtn.prop('disabled', true).html(`
+                        <div class="spinner-border spinner-border-sm" role="status" style="width:18px;height:18px;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    `);
+
+                    $.ajax({
+                        url: '@Url.Action("AddComment", "Home")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            postId: postId,
+                            userId: '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value',
+                            content: content
+                        }),
+                        success: function() {
+                            $textarea.val('').css('height', 'auto');
+                            loadComments();
+                            $.get('@Url.Action("GetCommentCount", "Home")', { postId: postId }, function(data) {
+                                const count = data.count;
+                                const countSpan = $(`.comment-count[data-post-id="${postId}"]`);
+                                if (countSpan.length) {
+                                    countSpan.text(count + (count === 1 ? " Comment" : " Comments"));
+                                }
+                            });
+                            
+                            $sendBtn.html('✓').css('background', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+                            showNotification("Comment posted! 💬");
+                            setTimeout(() => {
+                                $sendBtn.html(`
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="width:22px;height:22px;">
+                                        <path d="m22 2-7 20-4-9-9-4 20-7z"/>
+                                    </svg>
+                                `).css('background', '');
+                            }, 1500);
+                        },
+                        error: function() {
+                            showNotification("Failed to post comment. Please try again.", 'error');
+                        },
+                        complete: function() {
+                            $sendBtn.prop('disabled', false);
+                        }
+                    });
+                }
+
+                popup.find('.send-btn').on('click', sendComment);
+                popup.find('.comment-textarea').on('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendComment();
+                    }
+                });
+
+                setTimeout(() => {
+                    popup.find('.comment-textarea').focus();
+                }, 300);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.save-btn', function() {
+            const $btn = $(this);
+            const postId = $btn.data('post-id');
+            const $icon = $btn.find('.toggle-save');
+            
+            // Optimistic UI update
+            const isCurrentlySaved = $icon.hasClass('bi-bookmark-fill');
+            if (isCurrentlySaved) {
+                $icon.removeClass('bi-bookmark-fill text-dark').addClass('bi-bookmark');
+            } else {
+                $icon.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-dark');
+            }
+            
+            $.post('@Url.Action("ToggleSave", "Home")', { postId: postId }, function(res) {
+                if (res.isSaved) {
+                    $icon.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-dark');
+                    showNotification("Post saved! 📌");
+                } else {
+                    $icon.removeClass('bi-bookmark-fill text-dark').addClass('bi-bookmark');
+                    showNotification("Post unsaved", 'info');
+                }
+            }).fail(function() {
+                // Revert on failure
+                if (isCurrentlySaved) {
+                    $icon.removeClass('bi-bookmark').addClass('bi-bookmark-fill text-dark');
+                } else {
+                    $icon.removeClass('bi-bookmark-fill text-dark').addClass('bi-bookmark');
+                }
+                showNotification("Failed to toggle save status. Please try again.", 'error');
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.report-link', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const postId = $(this).data('post-id');
+
+                $('.report-popup').remove();
+                const popup = $(`
+                    <style>
+                        .report-popup {
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            z-index: 1050;
+                            background: rgba(255, 255, 255, 0.95);
+                            border-radius: var(--border-radius-xl);
+                            box-shadow: var(--shadow-xl);
+                            width: 360px;
+                            max-width: 90%;
+                            overflow: hidden;
+                            animation: slideInScale 0.3s ease-out;
+                            backdrop-filter: var(--backdrop-blur);
+                        }
+                        .report-popup .header {
+                            background: var(--teal-gradient);
+                            padding: 24px 28px;
+                            color: white;
+                            font-weight: 700;
+                            text-align: center;
+                            position: relative;
+                            font-size: 1.1rem;
+                        }
+                        .report-popup ul {
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                        }
+                        .report-popup li {
+                            padding: 18px 28px;
+                            cursor: pointer;
+                            color: var(--text-primary);
+                            font-weight: 500;
+                            border-bottom: 1px solid var(--border-light);
+                            transition: all 0.3s ease;
+                            display: flex;
+                            align-items: center;
+                            font-size: 15px;
+                        }
+                        .report-popup li:last-child {
+                            border-bottom: none;
+                        }
+                        .report-popup li:hover {
+                            background: var(--teal-glow);
+                            color: var(--primary-teal);
+                            transform: translateX(6px);
+                        }
+                        .report-popup .close-btn {
+                            position: absolute;
+                            top: 18px;
+                            right: 24px;
+                            cursor: pointer;
+                            font-size: 20px;
+                            color: white;
+                            background: rgba(255, 255, 255, 0.2);
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.2s ease;
+                        }
+                        .report-popup .close-btn:hover {
+                            background: rgba(255, 255, 255, 0.3);
+                            transform: scale(1.1);
+                        }
+                    </style>
+                    <div class="report-popup">
+                        <div class="header">
+                            🚩 Report Post
+                            <span class="close-btn">&times;</span>
+                        </div>
+                        <ul>
+                            <li class="report-reason" data-reason="Spam or misleading">
+                                <span style="margin-right:14px;font-size:18px;">📧</span>
+                                Spam or misleading
+                            </li>
+                            <li class="report-reason" data-reason="Hate speech or symbols">
+                                <span style="margin-right:14px;font-size:18px;">⚠️</span>
+                                Hate speech or symbols
+                            </li>
+                            <li class="report-reason" data-reason="Harassment or bullying">
+                                <span style="margin-right:14px;font-size:18px;">😡</span>
+                                Harassment or bullying
+                            </li>
+                            <li class="report-reason" data-reason="Nudity or sexual content">
+                                <span style="margin-right:14px;font-size:18px;">🔞</span>
+                                Nudity or sexual content
+                            </li>
+                            <li class="report-reason" data-reason="Violence or dangerous acts">
+                                <span style="margin-right:14px;font-size:18px;">⚡</span>
+                                Violence or dangerous acts
+                            </li>
+                        </ul>
+                    </div>
+                `);
+                $('body').append(popup);
+
+                popup.find('.close-btn').on('click', function() {
+                    popup.fadeOut(200, function() {
+                        popup.remove();
+                    });
+                });
+
+                popup.find('.report-reason').on('click', function() {
+                    const $reason = $(this);
+                    const reason = $reason.data('reason');
+                    const token = $('#__RequestVerificationToken').val();
+
+                    $reason.html(`
+                        <div class="spinner-border spinner-border-sm me-2" role="status" style="color:var(--primary-teal);width:18px;height:18px;"></div>
+                        Submitting...
+                    `);
+
+                    $.ajax({
+                        url: '/Home/ReportPost',
+                        method: 'POST',
+                        data: {
+                            __RequestVerificationToken: token,
+                            ReportedPostId: postId,
+                            Reason: reason
+                        },
+                        success: function() {
+                            $reason.html(`
+                                <span style="margin-right:14px;font-size:18px;">✅</span>
+                                Report submitted successfully
+                            `).css({
+                                'background': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                'color': 'white',
+                                'transform': 'none'
+                            });
+                            showNotification("Report submitted successfully. Thank you for keeping our community safe! 🛡️");
+                            setTimeout(() => {
+                                popup.fadeOut(300, function() {
+                                    popup.remove();
+                                });
+                            }, 2000);
+                        },
+                        error: function() {
+                            $reason.html(`
+                                <span style="margin-right:14px;font-size:18px;">❌</span>
+                                Something went wrong
+                            `).css({
+                                'background': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                'color': 'white'
+                            });
+                            showNotification("Failed to submit report. Please try again.", 'error');
+                            setTimeout(() => {
+                                popup.fadeOut(300, function() {
+                                    popup.remove();
+                                });
+                            }, 2500);
+                        }
+                    });
+                });
+
+                $(document).on('click.reportPopup', function(e) {
+                    if (!$(e.target).closest('.report-popup').length) {
+                        popup.fadeOut(200, function() {
+                            popup.remove();
+                        });
+                        $(document).off('click.reportPopup');
+                    }
+                });
+            });
+        });
+    </script>
+}
